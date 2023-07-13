@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// これを追記しました
+generator erd {
+  provider = "prisma-erd-generator"
+  theme = "forest"
+  output = "ERD.md"
+  includeRelationFromFields = true
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  userId String @id @default(uuid())
+  userProfile UserProfile?
+  userActive UserActive?
+  userDeleted UserDeleted?
+  posts Post[]
+}
+
+model UserActive {
+  userId String @id
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [userId])
+}
+
+model UserProfile {
+  userId String @id
+  name String
+  firstName String
+  lastName String
+  middleName String
+  age Int
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [userId])
+}
+
+model UserDeleted {
+  userId String @id @default(uuid())
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [userId])
+}
+
+model Post {
+  title String @id
+  userId String
+  user User @relation(fields: [userId], references: [userId])
+}
